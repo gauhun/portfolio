@@ -4,6 +4,7 @@
 import { motion } from "framer-motion";
 import HireModal from './components/HireModal';
 import { useState } from "react";
+import { getAssetPath } from '../utils/assetPath';
 
 // Animation variants
 const containerVariants = {
@@ -143,14 +144,14 @@ interface Project {
 
 // Add this array at the top level with your other constants
 const techLogos = [
-  { name: "GitHub", icon: "/logos/github.png" },
-  { name: "Firebase", icon: "/logos/firebase.png" },
-  { name: "Flutter", icon: "/logos/flutter.png" },
-  { name: "Dart", icon: "/logos/dart.png" },
-  { name: "Zeplin", icon: "/logos/zeplin.png" },
-  { name: "Figma", icon: "/logos/figma.png" },
-  { name: "YouTube", icon: "/logos/youtube.png" },
-  { name: "Node.js", icon: "/logos/nodejs.png" },
+  { name: "GitHub", icon: getAssetPath("/logos/github.png") },
+  { name: "Firebase", icon: getAssetPath("/logos/firebase.png") },
+  { name: "Flutter", icon: getAssetPath("/logos/flutter.png") },
+  { name: "Dart", icon: getAssetPath("/logos/dart.png") },
+  { name: "Zeplin", icon: getAssetPath("/logos/zeplin.png") },
+  { name: "Figma", icon: getAssetPath("/logos/figma.png") },
+  { name: "YouTube", icon: getAssetPath("/logos/youtube.png") },
+  { name: "Node.js", icon: getAssetPath("/logos/nodejs.png") },
 ];
 
 function ProjectCard({ project }: { project: Project }) {
