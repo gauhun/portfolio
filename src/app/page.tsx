@@ -141,6 +141,17 @@ interface Project {
   type?: string;
 }
 
+// Add this array at the top level with your other constants
+const techLogos = [
+  { name: "GitHub", icon: "/logos/github.png" },
+  { name: "Firebase", icon: "/logos/firebase.png" },
+  { name: "Flutter", icon: "/logos/flutter.png" },
+  { name: "Dart", icon: "/logos/dart.png" },
+  { name: "Zeplin", icon: "/logos/zeplin.png" },
+  { name: "Figma", icon: "/logos/figma.png" },
+  { name: "YouTube", icon: "/logos/youtube.png" },
+  { name: "Node.js", icon: "/logos/nodejs.png" },
+];
 
 function ProjectCard({ project }: { project: Project }) {
   const [expanded, setExpanded] = useState(false);
@@ -376,11 +387,32 @@ export default function Home() {
               <div className="absolute inset-0 bg-red-500/5 blur-[80px]" />
               {/* Add a subtle inner shadow */}
               <div className="absolute inset-0 shadow-inner" />
-              <img
-                src="/garoono-logo.png"
-                alt="Garoono Logo"
-                className="w-[400px] h-[400px] object-contain relative z-10"
-              />
+              
+              {/* Floating logos */}
+              {techLogos.map((logo, index) => (
+                <motion.img
+                  key={logo.name}
+                  src={logo.icon}
+                  alt={logo.name}
+                  className="w-12 h-12 absolute"
+                  initial={{ 
+                    x: 0, 
+                    y: 0,
+                    opacity: 0.7
+                  }}
+                  animate={{ 
+                    x: [0, Math.sin(index) * 100, 0],
+                    y: [0, Math.cos(index) * 100, 0],
+                    opacity: [0.7, 1, 0.7],
+                    scale: [1.1, 1.5, 1.1]
+                  }}
+                  transition={{
+                    duration: 5 + index,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>
