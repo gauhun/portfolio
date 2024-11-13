@@ -314,7 +314,7 @@ function ReviewsSection() {
   }, []);
 
   useEffect(() => {
-    if (!scrollRef.current || loadedImages.length === 0 || isMouseOver) return;
+    if (!scrollRef.current || loadedImages.length === 0 || isMouseOver || isLongPress) return;
     
     const scrollContainer = scrollRef.current;
     let scrollPos = scrollContainer.scrollLeft;
@@ -328,7 +328,7 @@ function ReviewsSection() {
     }, 16);
     
     return () => clearInterval(intervalId);
-  }, [loadedImages, isMouseOver]);
+  }, [loadedImages, isMouseOver, isLongPress]);
 
   // Handle long press start
   const handleTouchStart = () => {
