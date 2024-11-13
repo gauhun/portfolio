@@ -291,7 +291,8 @@ function ReviewsSection() {
   const [loadedImages, setLoadedImages] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const reviewImages = getReviewImages();
-  const SCROLL_SPEED = 0.5; // Pixels per frame - adjust this to control speed
+  const [isMouseOver, setIsMouseOver] = useState(false);
+  const SCROLL_SPEED = 0.5;
 
   useEffect(() => {
     const loadImages = async () => {
@@ -303,34 +304,29 @@ function ReviewsSection() {
         });
       });
 
-      const loadedPaths = await Promise.all(images);
-      setLoadedImages([...loadedPaths, ...loadedPaths, ...loadedPaths] as string[]); // Triple the images for smoother loop
+      const loadedPaths = await Promise.all(images) as string[];
+      setLoadedImages([...loadedPaths, ...loadedPaths, ...loadedPaths]);
     };
 
     loadImages();
   }, []);
 
   useEffect(() => {
-    if (!scrollRef.current || loadedImages.length === 0) return;
+    if (!scrollRef.current || loadedImages.length === 0 || isMouseOver) return;
     
     const scrollContainer = scrollRef.current;
-    let scrollPos = 0;
+    let scrollPos = scrollContainer.scrollLeft;
     
-    const scroll = () => {
+    const intervalId = setInterval(() => {
       scrollPos += SCROLL_SPEED;
-      
-      // Reset position when reaching the middle set of images
       if (scrollPos >= scrollContainer.scrollWidth / 3) {
         scrollPos = 0;
       }
-      
       scrollContainer.scrollLeft = scrollPos;
-    };
-    
-    const intervalId = setInterval(scroll, 16); // ~60fps
+    }, 16);
     
     return () => clearInterval(intervalId);
-  }, [loadedImages]);
+  }, [loadedImages, isMouseOver]);
 
   return (
     <section id="reviews" className="py-20 bg-[#0A0A0A]">
@@ -347,8 +343,16 @@ function ReviewsSection() {
         <div className="relative overflow-hidden">
           <div 
             ref={scrollRef}
-            className="flex gap-4 overflow-x-hidden whitespace-nowrap"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            onMouseEnter={() => setIsMouseOver(true)}
+            onMouseLeave={() => setIsMouseOver(false)}
+            onTouchStart={() => setIsMouseOver(true)}
+            onTouchEnd={() => setIsMouseOver(false)}
+            className="flex gap-4 overflow-x-auto whitespace-nowrap cursor-grab active:cursor-grabbing"
+            style={{ 
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
           >
             {loadedImages.map((image, index) => (
               <div
@@ -366,6 +370,7 @@ function ReviewsSection() {
                     objectPosition: "center",
                     backgroundColor: "#1A1A1A",
                   }}
+                  draggable={false}
                 />
               </div>
             ))}
