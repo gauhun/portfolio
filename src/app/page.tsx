@@ -456,8 +456,58 @@ function ScrollToTopButton() {
   );
 }
 
+// Add this new component for mobile menu
+function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: "100%" }}
+      animate={{ opacity: isOpen ? 1 : 0, x: isOpen ? 0 : "100%" }}
+      transition={{ duration: 0.3 }}
+      className={`fixed inset-0 bg-black/95 z-50 ${isOpen ? "block" : "hidden"}`}
+    >
+      <div className="flex flex-col items-center justify-center h-full gap-8">
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 text-white"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <a href="#home" onClick={onClose} className="text-2xl text-white hover:text-red-500">
+          Home
+        </a>
+        <a href="#projects" onClick={onClose} className="text-2xl text-white hover:text-red-500">
+          Projects
+        </a>
+        <a href="#experience" onClick={onClose} className="text-2xl text-white hover:text-red-500">
+          Experience
+        </a>
+        <a href="#reviews" onClick={onClose} className="text-2xl text-white hover:text-red-500">
+          Reviews
+        </a>
+        <a href="#education" onClick={onClose} className="text-2xl text-white hover:text-red-500">
+          Education
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Home() {
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="bg-[#0A0A0A]">
@@ -467,78 +517,102 @@ export default function Home() {
           <motion.div className="text-2xl font-bold text-white flex items-center gap-2">
             <span className="bg-red-500 p-2 rounded">GSR</span>
           </motion.div>
-          <div className="flex gap-8 text-gray-300">
-            <a href="#home" className="hover:text-red-500">
-              Home
-            </a>
-            <a href="#projects" className="hover:text-red-500">
-              Projects
-            </a>
-            <a href="#experience" className="hover:text-red-500">
-              Experience
-            </a>
-
-            <a href="#reviews" className="hover:text-red-500">
-              Reviews
-            </a>
-            <a href="#education" className="hover:text-red-500">
-              Education
-            </a>
+          
+          {/* Desktop Menu */}
+          <div className="hidden md:flex gap-8 text-gray-300">
+            <a href="#home" className="hover:text-red-500">Home</a>
+            <a href="#projects" className="hover:text-red-500">Projects</a>
+            <a href="#experience" className="hover:text-red-500">Experience</a>
+            <a href="#reviews" className="hover:text-red-500">Reviews</a>
+            <a href="#education" className="hover:text-red-500">Education</a>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-white"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+
+          {/* Let's Talk Button - Hide on mobile */}
           <motion.a
             href="https://www.linkedin.com/in/gauhun/"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
-            className="bg-transparent border border-red-500 text-red-500 px-6 py-2 rounded-full hover:bg-red-500 hover:text-white transition-colors"
+            className="hidden md:block bg-transparent border border-red-500 text-red-500 px-6 py-2 rounded-full hover:bg-red-500 hover:text-white transition-colors"
           >
             Let&apos;s Talk
           </motion.a>
         </div>
       </nav>
-      {/* Hero Section */}
+
+      {/* Mobile Menu */}
+      <MobileMenu 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
+
+      {/* Hero Section - Make it responsive */}
       <section
         id="home"
         className="min-h-screen pt-32 px-4 sm:px-6 lg:px-8 bg-[#0A0A0A] text-white"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="max-w-2xl h-[600px] flex items-center">
+        <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-8">
+          <div className="w-full md:max-w-2xl h-auto md:h-[600px] flex items-center">
             <motion.div
               initial="hidden"
               animate="visible"
               variants={containerVariants}
-              className="pl-8"
+              className="w-full pl-0 md:pl-8 text-center md:text-left"
             >
               <motion.h1
                 variants={itemVariants}
-                className="text-6xl font-bold mb-4"
+                className="text-4xl md:text-6xl font-bold mb-4"
               >
                 <span className="text-red-500">Hello,</span> I&apos;m Gautam
               </motion.h1>
               <motion.h2
                 variants={itemVariants}
-                className="text-5xl font-bold mb-6"
+                className="text-3xl md:text-5xl font-bold mb-6"
               >
                 Senior Flutter Developer
               </motion.h2>
               <motion.h3
                 variants={itemVariants}
-                className="text-4xl font-bold mb-8"
+                className="text-2xl md:text-4xl font-bold mb-8"
               >
                 Based in Delhi
               </motion.h3>
               <motion.p
                 variants={itemVariants}
-                className="text-gray-400 mb-8 max-w-lg"
+                className="text-gray-400 mb-8 max-w-lg mx-auto md:mx-0"
               >
                 A Passionate Flutter Developer With More than 5 Years Of
                 Experience Who Is Always Excited To Work With You To Creating
                 Wonderful Applications!
               </motion.p>
-              <motion.div variants={itemVariants} className="flex gap-4">
+              <motion.div 
+                variants={itemVariants} 
+                className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
+              >
                 <button
                   onClick={() => setIsHireModalOpen(true)}
-                  className="bg-red-500 text-white px-8 py-3 rounded-full hover:bg-red-600 transition-colors"
+                  className="w-full sm:w-auto bg-red-500 text-white px-8 py-3 rounded-full hover:bg-red-600 transition-colors"
                 >
                   Hire Me
                 </button>
@@ -546,7 +620,7 @@ export default function Home() {
                   href="https://drive.google.com/file/d/1sWRkxef8ZJojO1A6MtVOBX9cQjQS_hVh/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-gray-600 text-white px-8 py-3 rounded-full flex items-center gap-2 hover:border-gray-500 transition-colors"
+                  className="w-full sm:w-auto border border-gray-600 text-white px-8 py-3 rounded-full flex items-center justify-center gap-2 hover:border-gray-500 transition-colors"
                 >
                   Download CV <span>→</span>
                 </a>
@@ -554,8 +628,9 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="relative h-[600px] flex items-center">
-            <div className="bg-[#0A0A0A] w-[400px] h-[400px] rounded-full overflow-hidden border-4 border-red-500 flex items-center justify-center relative">
+          {/* Tech Circle - Make it responsive */}
+          <div className="relative h-[300px] md:h-[600px] flex items-center justify-center w-full md:w-auto">
+            <div className="bg-[#0A0A0A] w-[250px] h-[250px] md:w-[400px] md:h-[400px] rounded-full overflow-hidden border-4 border-red-500 flex items-center justify-center relative">
               {/* Enhanced gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 via-red-500/10 to-transparent" />
               {/* Multiple blur layers for better effect */}
@@ -593,11 +668,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       {/* Projects Section */}
-      <section
-        id="projects"
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0A0A0A]"
-      >
+      <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0A0A0A]">
         <div className="max-w-7xl mx-auto">
           <motion.h2
             {...fadeIn}
@@ -605,30 +678,26 @@ export default function Home() {
           >
             Projects
           </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </div>
       </section>
-      {/* Experience Section */}
-      <section
-        id="experience"
-        className="py-32 bg-[#0A0A0A] px-4 sm:px-6 lg:px-8"
-      >
+
+      {/* Experience Section - Update timeline for mobile */}
+      <section id="experience" className="py-20 md:py-32 bg-[#0A0A0A] px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.h2
             {...fadeIn}
-            className="text-3xl font-bold mb-20 text-center text-white"
+            className="text-3xl font-bold mb-12 md:mb-20 text-center text-white"
           >
             Work Experience
           </motion.h2>
           <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-[19px] top-[20px] bottom-0 w-[2px] bg-red-500"></div>
-
-            <div className="space-y-24">
+            <div className="absolute left-[19px] top-[20px] bottom-0 w-[2px] bg-red-500 hidden md:block"></div>
+            <div className="space-y-12 md:space-y-24">
               <motion.div {...fadeIn} className="relative pl-16">
                 <div className="absolute left-0 top-1.5 w-10 h-10 bg-[#0A0A0A] border-4 border-red-500 rounded-full flex items-center justify-center">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -704,19 +773,17 @@ export default function Home() {
       </section>
 
       <ReviewsSection />
+
       {/* Education Section */}
-      <section
-        id="education"
-        className="py-16 bg-[#0A0A0A] px-4 sm:px-6 lg:px-8"
-      >
+      <section id="education" className="py-16 bg-[#0A0A0A] px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.h2
             {...fadeIn}
-            className="text-3xl font-bold mb-12 text-center text-white"
+            className="text-3xl font-bold mb-8 md:mb-12 text-center text-white"
           >
             Education
           </motion.h2>
-          <div className="space-y-8">
+          <div className="space-y-4 md:space-y-8">
             <motion.div
               {...fadeIn}
               className="bg-[#1A1A1A] p-6 rounded-lg border border-gray-800"
@@ -744,6 +811,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <HireModal
         isOpen={isHireModalOpen}
         onClose={() => setIsHireModalOpen(false)}
