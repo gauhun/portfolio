@@ -354,9 +354,8 @@ function ReviewsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl font-bold mb-12 text-center text-white"
-        >
-          User Reviews
+          className="text-3xl font-bold mb-12 text-center text-white">
+          App Reviews
         </motion.h2>
 
         <div className="relative overflow-hidden">
