@@ -6,6 +6,7 @@ import HireModal from "./components/HireModal";
 import { useState, useRef, useEffect } from "react";
 import { getAssetPath } from "../utils/assetPath";
 import { getReviewImages } from "../utils/getReviewImages";
+import Image from 'next/image';
 
 // Animation variants
 const containerVariants = {
@@ -287,55 +288,53 @@ function ProjectCard({ project }: { project: Project }) {
 }
 
 function ReviewsSection() {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [loadedImages, setLoadedImages] = useState<string[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const reviewImages = getReviewImages();
+  const SCROLL_SPEED = 0.5; // Pixels per frame - adjust this to control speed
 
   useEffect(() => {
-    // Preload images
-    reviewImages.forEach((imagePath) => {
-      const img = new Image();
-      img.src = getAssetPath(imagePath);
-      img.onload = () => {
-        setLoadedImages((prev) => [...prev, imagePath]);
-      };
-    });
+    const loadImages = async () => {
+      const images = reviewImages.map((imagePath: string) => {
+        const img = document.createElement('img');
+        img.src = getAssetPath(imagePath);
+        return new Promise((resolve) => {
+          img.onload = () => resolve(imagePath);
+        });
+      });
+
+      const loadedPaths = await Promise.all(images);
+      setLoadedImages([...loadedPaths, ...loadedPaths, ...loadedPaths] as string[]); // Triple the images for smoother loop
+    };
+
+    loadImages();
   }, []);
 
   useEffect(() => {
+    if (!scrollRef.current || loadedImages.length === 0) return;
+    
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer || loadedImages.length === 0) return;
-
-    // Calculate total scroll width
-    const totalWidth = scrollContainer.scrollWidth;
-    const viewportWidth = scrollContainer.offsetWidth;
-    let currentScroll = 0;
-
-    const animate = () => {
-      currentScroll += 0.5;
-
-      // Reset when reaching the end
-      if (currentScroll >= totalWidth / 2) {
-        currentScroll = 0;
+    let scrollPos = 0;
+    
+    const scroll = () => {
+      scrollPos += SCROLL_SPEED;
+      
+      // Reset position when reaching the middle set of images
+      if (scrollPos >= scrollContainer.scrollWidth / 3) {
+        scrollPos = 0;
       }
-
-      // Apply the scroll
-      if (scrollContainer) {
-        scrollContainer.scrollLeft = currentScroll;
-      }
+      
+      scrollContainer.scrollLeft = scrollPos;
     };
-
-    // Set up animation interval with slower timing
-    const animationInterval = setInterval(animate, 30);
-
-    return () => {
-      clearInterval(animationInterval);
-    };
+    
+    const intervalId = setInterval(scroll, 16); // ~60fps
+    
+    return () => clearInterval(intervalId);
   }, [loadedImages]);
 
   return (
     <section id="reviews" className="py-20 bg-[#0A0A0A]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -346,53 +345,30 @@ function ReviewsSection() {
         </motion.h2>
 
         <div className="relative overflow-hidden">
-          <div
+          <div 
             ref={scrollRef}
             className="flex gap-4 overflow-x-hidden whitespace-nowrap"
-            style={{
-              WebkitOverflowScrolling: "touch",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {/* First set of images */}
-            <div className="flex animate-scroll">
-              {loadedImages.map((image, index) => (
-                <div
-                  key={`first-${index}`}
-                  className="flex-shrink-0 w-[400px] px-2"
-                >
-                  <img
-                    src={getAssetPath(image)}
-                    alt={`Client Review ${index + 1}`}
-                    className="w-full h-[250px] rounded-xl shadow-lg"
-                    style={{
-                      objectFit: "contain",
-                      objectPosition: "center",
-                      backgroundColor: "#1A1A1A",
-                    }}
-                  />
-                </div>
-              ))}
-              {/* Duplicate set for seamless loop */}
-              {loadedImages.map((image, index) => (
-                <div
-                  key={`second-${index}`}
-                  className="flex-shrink-0 w-[400px] px-2"
-                >
-                  <img
-                    src={getAssetPath(image)}
-                    alt={`Client Review ${index + 1}`}
-                    className="w-full h-[250px] rounded-xl shadow-lg"
-                    style={{
-                      objectFit: "contain",
-                      objectPosition: "center",
-                      backgroundColor: "#1A1A1A",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+            {loadedImages.map((image, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-[400px] inline-block"
+              >
+                <Image
+                  src={getAssetPath(image)}
+                  alt={`Client Review ${index + 1}`}
+                  width={400}
+                  height={250}
+                  className="w-full h-[250px] rounded-xl shadow-lg"
+                  style={{
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    backgroundColor: "#1A1A1A",
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
