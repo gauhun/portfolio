@@ -504,27 +504,38 @@ export default function Home() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className="md:hidden flex items-center gap-4">
+            <motion.a
+              href="https://www.linkedin.com/in/gauhun/"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              className="bg-transparent border border-red-500 text-red-500 px-4 py-1.5 rounded-full hover:bg-red-500 hover:text-white transition-colors text-sm"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
-          </button>
+              Let&apos;s Talk
+            </motion.a>
+            <button
+              className="text-white"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
+            </button>
+          </div>
 
-          {/* Let's Talk Button - Hide on mobile */}
+          {/* Desktop Let's Talk Button */}
           <motion.a
             href="https://www.linkedin.com/in/gauhun/"
             target="_blank"
