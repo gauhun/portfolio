@@ -2,9 +2,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import HireModal from './components/HireModal';
-import { useState } from "react";
-import { getAssetPath } from '../utils/assetPath';
+import HireModal from "./components/HireModal";
+import { useState, useRef, useEffect } from "react";
+import { getAssetPath } from "../utils/assetPath";
+import { getReviewImages } from "../utils/getReviewImages";
 
 // Animation variants
 const containerVariants = {
@@ -171,14 +172,14 @@ function ProjectCard({ project }: { project: Project }) {
         }}
         whileHover={{
           y: -5,
-          transition: { duration: 0.2 }
+          transition: { duration: 0.2 },
         }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
         className={`bg-[#1A1A1A] rounded-xl p-6 shadow-lg border border-gray-800 
           ${expanded ? "relative" : ""} 
           transition-shadow duration-300
-          ${isHovered ? 'shadow-red-500/20 shadow-lg' : ''}`}
+          ${isHovered ? "shadow-red-500/20 shadow-lg" : ""}`}
       >
         {/* Add a subtle gradient animation on hover */}
         <motion.div
@@ -192,7 +193,7 @@ function ProjectCard({ project }: { project: Project }) {
 
         {/* Rest of your existing card content */}
         <div className="flex items-center justify-between mb-4">
-          <motion.h3 
+          <motion.h3
             className="text-xl font-bold text-white"
             animate={{ color: isHovered ? "#ef4444" : "#ffffff" }}
             transition={{ duration: 0.2 }}
@@ -200,7 +201,7 @@ function ProjectCard({ project }: { project: Project }) {
             {project.title}
           </motion.h3>
           {project.downloads && (
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="text-sm bg-red-500/20 text-red-500 px-3 py-1 rounded-full"
@@ -211,16 +212,16 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
 
         {/* Animate tags with stagger effect */}
-        <motion.div 
+        <motion.div
           className="flex flex-wrap gap-2 mb-4"
           initial="hidden"
           animate="visible"
           variants={{
             visible: {
               transition: {
-                staggerChildren: 0.1
-              }
-            }
+                staggerChildren: 0.1,
+              },
+            },
           }}
         >
           {project.tags.map((tag: string, index: number) => (
@@ -228,7 +229,7 @@ function ProjectCard({ project }: { project: Project }) {
               key={index}
               variants={{
                 hidden: { opacity: 0, scale: 0.8 },
-                visible: { opacity: 1, scale: 1 }
+                visible: { opacity: 1, scale: 1 },
               }}
               className="bg-red-500/20 text-red-500 px-3 py-1 rounded-full text-sm"
             >
@@ -238,7 +239,7 @@ function ProjectCard({ project }: { project: Project }) {
         </motion.div>
 
         {/* Animate the description */}
-        <motion.p 
+        <motion.p
           className="text-gray-400 mb-4"
           animate={{ opacity: expanded ? 1 : 0.7 }}
           transition={{ duration: 0.3 }}
@@ -285,6 +286,176 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
+function ReviewsSection() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [loadedImages, setLoadedImages] = useState<string[]>([]);
+  const reviewImages = getReviewImages();
+
+  useEffect(() => {
+    // Preload images
+    reviewImages.forEach((imagePath) => {
+      const img = new Image();
+      img.src = getAssetPath(imagePath);
+      img.onload = () => {
+        setLoadedImages((prev) => [...prev, imagePath]);
+      };
+    });
+  }, []);
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer || loadedImages.length === 0) return;
+
+    // Calculate total scroll width
+    const totalWidth = scrollContainer.scrollWidth;
+    const viewportWidth = scrollContainer.offsetWidth;
+    let currentScroll = 0;
+
+    const animate = () => {
+      currentScroll += 0.5;
+
+      // Reset when reaching the end
+      if (currentScroll >= totalWidth / 2) {
+        currentScroll = 0;
+      }
+
+      // Apply the scroll
+      if (scrollContainer) {
+        scrollContainer.scrollLeft = currentScroll;
+      }
+    };
+
+    // Set up animation interval with slower timing
+    const animationInterval = setInterval(animate, 30);
+
+    return () => {
+      clearInterval(animationInterval);
+    };
+  }, [loadedImages]);
+
+  return (
+    <section id="reviews" className="py-20 bg-[#0A0A0A]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-3xl font-bold mb-12 text-center text-white"
+        >
+          User Reviews
+        </motion.h2>
+
+        <div className="relative overflow-hidden">
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-hidden whitespace-nowrap"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {/* First set of images */}
+            <div className="flex animate-scroll">
+              {loadedImages.map((image, index) => (
+                <div
+                  key={`first-${index}`}
+                  className="flex-shrink-0 w-[400px] px-2"
+                >
+                  <img
+                    src={getAssetPath(image)}
+                    alt={`Client Review ${index + 1}`}
+                    className="w-full h-[250px] rounded-xl shadow-lg"
+                    style={{
+                      objectFit: "contain",
+                      objectPosition: "center",
+                      backgroundColor: "#1A1A1A",
+                    }}
+                  />
+                </div>
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {loadedImages.map((image, index) => (
+                <div
+                  key={`second-${index}`}
+                  className="flex-shrink-0 w-[400px] px-2"
+                >
+                  <img
+                    src={getAssetPath(image)}
+                    alt={`Client Review ${index + 1}`}
+                    className="w-full h-[250px] rounded-xl shadow-lg"
+                    style={{
+                      objectFit: "contain",
+                      objectPosition: "center",
+                      backgroundColor: "#1A1A1A",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Add this new component before your Home component
+function ScrollToTopButton() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.pageYOffset > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  return (
+    <motion.button
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={scrollToTop}
+      className="fixed bottom-8 right-8 bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 z-50"
+      style={{ display: isVisible ? 'block' : 'none' }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5 10l7-7m0 0l7 7m-7-7v18"
+        />
+      </svg>
+    </motion.button>
+  );
+}
+
 export default function Home() {
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
 
@@ -300,11 +471,15 @@ export default function Home() {
             <a href="#home" className="hover:text-red-500">
               Home
             </a>
+            <a href="#projects" className="hover:text-red-500">
+              Projects
+            </a>
             <a href="#experience" className="hover:text-red-500">
               Experience
             </a>
-            <a href="#projects" className="hover:text-red-500">
-              Projects
+
+            <a href="#reviews" className="hover:text-red-500">
+              Reviews
             </a>
             <a href="#education" className="hover:text-red-500">
               Education
@@ -322,8 +497,8 @@ export default function Home() {
         </div>
       </nav>
       {/* Hero Section */}
-      <section 
-        id="home" 
+      <section
+        id="home"
         className="min-h-screen pt-32 px-4 sm:px-6 lg:px-8 bg-[#0A0A0A] text-white"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -361,16 +536,16 @@ export default function Home() {
                 Wonderful Applications!
               </motion.p>
               <motion.div variants={itemVariants} className="flex gap-4">
-                <button 
+                <button
                   onClick={() => setIsHireModalOpen(true)}
                   className="bg-red-500 text-white px-8 py-3 rounded-full hover:bg-red-600 transition-colors"
                 >
                   Hire Me
                 </button>
-                <a 
+                <a
                   href="https://drive.google.com/file/d/1sWRkxef8ZJojO1A6MtVOBX9cQjQS_hVh/view?usp=sharing"
                   target="_blank"
-                  rel="noopener noreferrer" 
+                  rel="noopener noreferrer"
                   className="border border-gray-600 text-white px-8 py-3 rounded-full flex items-center gap-2 hover:border-gray-500 transition-colors"
                 >
                   Download CV <span>→</span>
@@ -388,7 +563,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-red-500/5 blur-[80px]" />
               {/* Add a subtle inner shadow */}
               <div className="absolute inset-0 shadow-inner" />
-              
+
               {/* Floating logos */}
               {techLogos.map((logo, index) => (
                 <motion.img
@@ -396,25 +571,44 @@ export default function Home() {
                   src={logo.icon}
                   alt={logo.name}
                   className="w-12 h-12 absolute"
-                  initial={{ 
-                    x: 0, 
+                  initial={{
+                    x: 0,
                     y: 0,
-                    opacity: 0.7
+                    opacity: 0.7,
                   }}
-                  animate={{ 
+                  animate={{
                     x: [0, Math.sin(index) * 100, 0],
                     y: [0, Math.cos(index) * 100, 0],
                     opacity: [0.7, 1, 0.7],
-                    scale: [1.1, 1.5, 1.1]
+                    scale: [1.1, 1.5, 1.1],
                   }}
                   transition={{
                     duration: 5 + index,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 />
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+      {/* Projects Section */}
+      <section
+        id="projects"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0A0A0A]"
+      >
+        <div className="max-w-7xl mx-auto">
+          <motion.h2
+            {...fadeIn}
+            className="text-3xl font-bold mb-12 text-center text-white"
+          >
+            Projects
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
           </div>
         </div>
       </section>
@@ -508,25 +702,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* Projects Section */}
-      <section
-        id="projects"
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0A0A0A]"
-      >
-        <div className="max-w-7xl mx-auto">
-          <motion.h2
-            {...fadeIn}
-            className="text-3xl font-bold mb-12 text-center text-white"
-          >
-            Projects
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        </div>
-      </section>
+
+      <ReviewsSection />
       {/* Education Section */}
       <section
         id="education"
@@ -567,10 +744,12 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <HireModal 
-        isOpen={isHireModalOpen} 
-        onClose={() => setIsHireModalOpen(false)} 
+      <HireModal
+        isOpen={isHireModalOpen}
+        onClose={() => setIsHireModalOpen(false)}
       />
+      
+      <ScrollToTopButton />
     </div>
   );
 }
