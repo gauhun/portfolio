@@ -384,13 +384,17 @@ function ReviewsSection() {
                   alt={`Client Review ${index + 1}`}
                   width={400}
                   height={250}
-                  className="w-full h-[250px] rounded-xl shadow-lg"
+                  className="w-full h-[250px] rounded-xl shadow-lg select-none"
                   style={{
                     objectFit: "contain",
                     objectPosition: "center",
                     backgroundColor: "#1A1A1A",
+                    WebkitTouchCallout: 'none', // Prevents iOS callout
+                    WebkitUserSelect: 'none',   // Prevents selection
                   }}
                   draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
                 />
               </div>
             ))}
