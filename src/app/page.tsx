@@ -292,6 +292,8 @@ function ReviewsSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const reviewImages = getReviewImages();
   const [isMouseOver, setIsMouseOver] = useState(false);
+  const [isLongPress, setIsLongPress] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout>();
   const SCROLL_SPEED = 0.5;
 
   useEffect(() => {
@@ -328,6 +330,23 @@ function ReviewsSection() {
     return () => clearInterval(intervalId);
   }, [loadedImages, isMouseOver]);
 
+  // Handle long press start
+  const handleTouchStart = () => {
+    setIsMouseOver(true);
+    longPressTimer.current = setTimeout(() => {
+      setIsLongPress(true);
+    }, 200); // 200ms threshold for long press
+  };
+
+  // Handle touch end/cancel
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+    }
+    setIsMouseOver(false);
+    setIsLongPress(false);
+  };
+
   return (
     <section id="reviews" className="py-20 bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto px-2">
@@ -345,8 +364,9 @@ function ReviewsSection() {
             ref={scrollRef}
             onMouseEnter={() => setIsMouseOver(true)}
             onMouseLeave={() => setIsMouseOver(false)}
-            onTouchStart={() => setIsMouseOver(true)}
-            onTouchEnd={() => setIsMouseOver(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
             className="flex gap-4 overflow-x-auto whitespace-nowrap cursor-grab active:cursor-grabbing"
             style={{ 
               scrollbarWidth: 'none', 
